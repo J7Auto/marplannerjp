@@ -76,6 +76,38 @@ export function celebrationParticles(
   }));
 }
 
+let activeCelebrations = 0;
+const settledListeners = new Set<() => void>();
+
+/** Runs `callback` once no celebration is on screen: right away when none is, otherwise when
+ * the last one is dismissed. Lets another surface (the printer pairing prompt) wait for the
+ * moment to finish instead of covering it. Returns a cancel function. */
+export function whenCelebrationsSettled(callback: () => void): () => void {
+  if (activeCelebrations === 0) {
+    callback();
+    return () => {};
+  }
+  settledListeners.add(callback);
+  return () => settledListeners.delete(callback);
+}
+
+function useActiveCelebration(): void {
+  useEffect(() => {
+    activeCelebrations += 1;
+    return () => {
+      activeCelebrations -= 1;
+      // A keyed replacement unmounts the old celebration before the new one's effect runs, in
+      // the same commit: recheck afterwards so that hand-over never reads as settled.
+      queueMicrotask(() => {
+        if (activeCelebrations > 0) return;
+        const listeners = [...settledListeners];
+        settledListeners.clear();
+        for (const listener of listeners) listener();
+      });
+    };
+  }, []);
+}
+
 function usePrefersReducedMotion(): boolean {
   const [reduced] = useState(
     () =>
@@ -99,6 +131,7 @@ export function CompletionCelebration({
   onDismiss,
 }: CompletionCelebrationProps): React.ReactPortal {
   const reducedMotion = usePrefersReducedMotion();
+  useActiveCelebration();
   const dismissRef = useRef(onDismiss);
   dismissRef.current = onDismiss;
 

@@ -1523,12 +1523,17 @@ export const messages = {
     "printing.executor.pairButton": "Pair printer",
     "printing.executor.repairButton": "Re-pair printer",
     "printing.executor.lastErrorLabel": "Last error:",
-    "printing.attention.pill": "Printer attention",
+    "printing.attention.pill": "Check printer",
     "printing.attention.title": "Printer needs attention",
-    "printing.attention.description":
-      "Open printer administration or pair the printer to continue.",
     "printing.attention.admin": "Printer administration",
     "printing.attention.dismiss": "Dismiss",
+    "printing.attention.waitingTitle": "Something is ready to print!",
+    "printing.attention.waitingDescription": "Connect the printer and it will print by itself.",
+    "printing.attention.knownPrinter": "The printer “{name}” is not connected.",
+    "printing.attention.knownPrinterUnnamed": "The usual printer is not connected.",
+    "printing.attention.noPrinter": "No printer has been paired on this screen yet.",
+    "printing.attention.connectedPrinter": "Connected to “{name}”.",
+    "printing.attention.reconnectButton": "Reconnect printer",
 
     // FR-012/FR-013/FR-018 and SC-003 cover the admin test-print trigger + jobs
     // list. `derivedState` renders dead-letter/retrying as their OWN distinct labels, never
@@ -3183,12 +3188,18 @@ export const messages = {
     "printing.executor.pairButton": "Emparejar impresora",
     "printing.executor.repairButton": "Volver a emparejar",
     "printing.executor.lastErrorLabel": "Último error:",
-    "printing.attention.pill": "Atención de impresora",
+    "printing.attention.pill": "Revisar impresora",
     "printing.attention.title": "La impresora necesita atención",
-    "printing.attention.description":
-      "Abre la administración de impresión o empareja la impresora para continuar.",
     "printing.attention.admin": "Administración de impresión",
     "printing.attention.dismiss": "Cerrar",
+    "printing.attention.waitingTitle": "¡Hay algo listo para imprimir!",
+    "printing.attention.waitingDescription": "Conecta la impresora y se imprimirá sola.",
+    "printing.attention.knownPrinter": "La impresora «{name}» no está conectada.",
+    "printing.attention.knownPrinterUnnamed": "La impresora de siempre no está conectada.",
+    "printing.attention.noPrinter":
+      "Todavía no se ha emparejado ninguna impresora en esta pantalla.",
+    "printing.attention.connectedPrinter": "Conectada a «{name}».",
+    "printing.attention.reconnectButton": "Volver a conectar",
 
     "printing.management.title": "Impresión",
     "printing.management.description":
