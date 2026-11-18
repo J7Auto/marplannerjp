@@ -212,7 +212,7 @@ describe("TodayChores behavior", () => {
 
   it("renders no-child and failed-period states without losing the usable board response", async () => {
     renderToday([], new Response(null, { status: 500 }) as unknown);
-    expect(await screen.findByText("No active children yet.")).toBeInTheDocument();
+    expect(await screen.findByText("No chores assigned yet.")).toBeInTheDocument();
 
     cleanup();
     renderToday([column("ari", "Ari")], null);

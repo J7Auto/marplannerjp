@@ -17,6 +17,7 @@
     "src/shared/**/*.ts",
     "tests/boundary/**/*.ts",
     "tests/integration/**/*.ts",
-    "tests/helpers/**/*.ts"
+    "tests/helpers/**/*.ts",
+    "seeds-casa/**/*.ts"
   ]
 }

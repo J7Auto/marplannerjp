@@ -189,7 +189,8 @@ describe("routines-assignments boundary tests", () => {
     }
   });
 
-  it("PUT /api/routines/:id/assignments/:memberId with parent → 400 (not a child, INV-01)", async () => {
+  // Fork (casa): adults can hold chores, so an active parent is a valid assignee.
+  it("PUT /api/routines/:id/assignments/:memberId with an active parent → 200", async () => {
     seedDayPeriods();
     const { deviceKey } = seedKeys();
     const { buildApp } = await import("../../src/server/app.ts");
@@ -214,10 +215,7 @@ describe("routines-assignments boundary tests", () => {
         payload: { weekdays: ["mon"] },
       });
 
-      // Parent → 400 (validation error — must be a child)
-      expect(res.statusCode).toBe(400);
-      const body = JSON.parse(res.body);
-      expect(body).toHaveProperty("error");
+      expect(res.statusCode).toBe(200);
     } finally {
       await app.close();
     }

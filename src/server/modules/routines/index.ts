@@ -2,7 +2,20 @@ import { validateWeekdays as validateWeekdayTokens } from "../../../shared/weekd
 import { randomUUID } from "node:crypto";
 import { getDb } from "../../db/client";
 import type { Routine, Chore } from "../../../shared";
-import { listActiveChildren } from "../members/referential";
+import { listActiveMembers } from "../members/referential";
+
+/** Fork change (casa): chores are not child-only. Any active member can hold an assignment.
+ * The board keeps every active child (upstream behaviour, even with no chores) and adds an
+ * active parent only when they hold at least one active assignment, so a household with kids
+ * looks the same as before and an adults-only household gets a column per assigned adult. */
+function listChoreParticipants(): ReturnType<typeof listActiveMembers> {
+  return listActiveMembers();
+}
+
+function listBoardMembers(): ReturnType<typeof listActiveMembers> {
+  const assigned = new Set(listAllActiveAssignments().map((a) => a.memberId));
+  return listActiveMembers().filter((m) => m.role === "child" || assigned.has(m.id));
+}
 import type { BoardChore, BoardColumn, BoardDayPeriod } from "../../../shared";
 import { isStrictCalendarDate, readHouseholdTimezone, weekdayOf } from "../../lib/household-date";
 import { listDayPeriods } from "../day-periods";
@@ -671,11 +684,11 @@ export function upsertAssignment(
     throw new RoutineNotFoundError(`Routine "${routineId}" does not exist`);
   }
 
-  // Validate memberId is an active child via listActiveChildren (reuse referential.ts)
-  const activeChildren = listActiveChildren();
-  if (!activeChildren.some((c) => c.id === memberId)) {
+  // Validate memberId is an active member (fork: adults can hold chores too)
+  const participants = listChoreParticipants();
+  if (!participants.some((c) => c.id === memberId)) {
     throw new AssignmentValidationError(
-      `Member "${memberId}" is not an active child — assignments require an active child`
+      `Member "${memberId}" is not an active member — assignments require an active member`
     );
   }
 
@@ -892,7 +905,7 @@ export function getBoard(date: string): BoardColumn[] {
     throw new BoardValidationError();
   }
 
-  const children = listActiveChildren();
+  const children = listBoardMembers();
   if (children.length === 0) {
     return [];
   }
@@ -1113,8 +1126,8 @@ export function getStreak(memberId: string, asOfDate: string): number {
  * caller separately checks the chore itself is active.
  */
 function isCurrentlyScheduled(routineId: string, memberId: string, date: string): boolean {
-  const activeChildren = listActiveChildren();
-  if (!activeChildren.some((c) => c.id === memberId)) return false;
+  const participants = listChoreParticipants();
+  if (!participants.some((c) => c.id === memberId)) return false;
 
   const weekday = weekdayOf(date, readHouseholdTimezone());
   const assignments = listAllActiveAssignments();

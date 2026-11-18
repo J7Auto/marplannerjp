@@ -4,6 +4,7 @@
  */
 import { build } from "esbuild";
 import { cpSync, mkdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { resolveBuildInfo } from "./build-info.mjs";
 import { assertNoPrivateInputs, seedBundlePlugin } from "./seed-bundle-plugin.mjs";
 import { writeLicenses } from "./bundled-licenses.mjs";
@@ -16,6 +17,15 @@ const NATIVE_EXTERNALS = ["argon2", "better-sqlite3", ...RESVG_EXTERNALS];
 const REQUIRE_SHIM_BANNER = {
   js: "import { createRequire as __cr } from 'node:module'; const require = __cr(import.meta.url);",
 };
+
+// Fork (casa): which seed profile MP_SEED_ON_EMPTY bundles. "casa" (default) is the
+// Spanish household in seeds-casa/; "simpsons" is the upstream demo in seeds/.
+const SEED_SETS = { casa: "seeds-casa", simpsons: "seeds" };
+const seedSet = process.env.MP_SEED_SET?.trim() || "casa";
+if (!(seedSet in SEED_SETS)) {
+  throw new Error(`MP_SEED_SET must be one of: ${Object.keys(SEED_SETS).join(", ")}`);
+}
+console.log(`seed profile bundled → ${SEED_SETS[seedSet]}/ (MP_SEED_SET=${seedSet})`);
 
 const server = await build({
   entryPoints: ["src/server/index.ts"],
@@ -31,7 +41,7 @@ const server = await build({
   // The admin overview compares this with the commit stamped into the client bundle.
   define: { __MP_BUILD__: JSON.stringify(resolveBuildInfo()) },
   // Public seeds for MP_SEED_ON_EMPTY; see the plugin for why they share this bundle.
-  plugins: [seedBundlePlugin()],
+  plugins: [seedBundlePlugin({ seedsDirectory: resolve(SEED_SETS[seedSet]) })],
   metafile: true,
 });
 assertNoPrivateInputs(server.metafile);

@@ -703,12 +703,13 @@ describe("RoutinesManagement — assignments", () => {
     return screen.findByTestId("assignment-dialog");
   }
 
-  it("lists children only, and a brand-new assignment saves without confirmation", async () => {
+  // Fork (casa): adults can hold chores too, so parents are listed alongside children.
+  it("lists every active member, and a brand-new assignment saves without confirmation", async () => {
     const calls = mockBackend();
     renderPage();
     const dialog = await openAssignments();
 
-    expect(within(dialog).queryByText("Pat")).not.toBeInTheDocument();
+    expect(within(dialog).getByText("Pat")).toBeInTheDocument();
     const row = within(dialog).getByTestId("routine-assignment-m1");
     fireEvent.click(within(row).getByRole("checkbox", { name: "Mon" }));
     fireEvent.click(within(row).getByRole("button", { name: "Save Assignment" }));
@@ -794,11 +795,11 @@ describe("RoutinesManagement — assignments", () => {
     );
   });
 
-  it("explains how to add a child when there is none", async () => {
-    mockBackend({ members: [PARENT] });
+  it("explains how to add a member when there is none", async () => {
+    mockBackend({ members: [] });
     renderPage();
     expect(await openAssignments()).toHaveTextContent(
-      "There are no children to assign yet. Add one in Members."
+      "There are no members to assign yet. Add one in Members."
     );
   });
 });

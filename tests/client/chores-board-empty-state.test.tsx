@@ -48,7 +48,7 @@ describe("ChoresBoard — zero-active-children empty state (#415)", () => {
     );
 
     expect(
-      await screen.findByText("No active children yet. Add a child in Members Management.")
+      await screen.findByText("No chores assigned yet. Assign a routine to a member in Admin.")
     ).toBeInTheDocument();
     expect(screen.queryByTestId("chores-board")).not.toBeInTheDocument();
   });

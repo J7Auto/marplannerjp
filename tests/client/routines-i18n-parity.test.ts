@@ -99,7 +99,7 @@ describe("routines-i18n-parity", () => {
     expect(messages.en["chores.board.loading"]).toBe("Loading…");
     expect(messages.en["chores.board.error"]).toBe("Failed to load the board.");
     expect(messages.en["chores.board.noChildren"]).toBe(
-      "No active children yet. Add a child in Members Management."
+      "No chores assigned yet. Assign a routine to a member in Admin."
     );
     expect(messages.en["chores.board.streakLabel"]).toBe("Streak:");
     expect(messages.en["chores.board.progressLabel"]).toBe("Progress:");
@@ -162,7 +162,7 @@ describe("routines-i18n-parity", () => {
     expect(messages.es["chores.board.loading"]).toBe("Cargando…");
     expect(messages.es["chores.board.error"]).toBe("Error al cargar el tablero.");
     expect(messages.es["chores.board.noChildren"]).toBe(
-      "No hay niños activos todavía. Añade uno en Gestión de Miembros."
+      "Todavía no hay tareas asignadas. Asigna una rutina a alguien en Administración."
     );
     expect(messages.es["chores.board.streakLabel"]).toBe("Racha:");
     expect(messages.es["chores.board.progressLabel"]).toBe("Progreso:");

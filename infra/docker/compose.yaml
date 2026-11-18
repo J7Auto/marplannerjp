@@ -4,10 +4,14 @@ services:
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile
+      args:
+        # Fork (casa): seed profile for MP_SEED_ON_EMPTY — casa (default) or simpsons.
+        MP_SEED_SET: ${MP_SEED_SET:-casa}
     ports:
       - target: 3000
         published: "${PUBLISHED_PORT:-0}"
-        host_ip: 127.0.0.1
+        # Fork (casa): 0.0.0.0 to reach it from the wall tablet on the home network.
+        host_ip: ${PUBLISHED_HOST:-127.0.0.1}
         protocol: tcp
     volumes:
       - marplanner-data:/data

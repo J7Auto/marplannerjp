@@ -25,6 +25,10 @@ COPY public/ public/
 # Public demo seeds compiled into the server bundle for MP_SEED_ON_EMPTY (see
 # scripts/seed-bundle-plugin.mjs); .dockerignore keeps every *PRIVATE* overlay out of the context.
 COPY seeds/ seeds/
+# Fork (casa): household profile; MP_SEED_SET=simpsons bundles the upstream demo instead.
+COPY seeds-casa/ seeds-casa/
+ARG MP_SEED_SET=casa
+ENV MP_SEED_SET=$MP_SEED_SET
 COPY scripts/ scripts/
 COPY tools/check-plugin-events.mjs tools/
 RUN npm run build

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { authFetch } from "@/lib/credential";
 import {
-  Role,
   type Assignment,
   type Chore,
   type ChoreInput,
@@ -146,7 +145,8 @@ export function RoutinesManagement() {
       : detail.status !== "idle" && detail.routineId === selected.id
         ? detail
         : { status: "loading", routineId: selected.id };
-  const childMembers = members.filter((m) => m.role === Role.child);
+  // Fork change (casa): any active member can hold chores, not only children.
+  const childMembers = members.filter((m) => m.lifecycle === "active");
   const periodLabel = (id: string) => {
     const period = dayPeriods.find((p) => p.id === id);
     return period ? t(DAY_PERIOD_LABEL_KEYS[period.id]) : "";

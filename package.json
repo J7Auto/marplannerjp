@@ -52,6 +52,7 @@
     "devices": "node --env-file-if-exists=.env.local --import tsx src/server/auth/devices-cli.ts",
     "seed:all": "node tools/dev/seed-all.mjs",
     "seed:private": "node --env-file-if-exists=.env.local --import tsx src/server/db/seeds/cli.ts --mode private",
+    "seed:casa": "SEED_DIRECTORY=seeds-casa node --env-file-if-exists=.env.local --import tsx src/server/db/seeds/cli.ts --mode public",
     "seed:public": "node --env-file-if-exists=.env.local --import tsx src/server/db/seeds/cli.ts --mode public",
     "seed:sync-private": "node tools/dev/sync-private-seeds.mjs",
     "smoke:deploy": "node tools/deploy/smoke.mjs",

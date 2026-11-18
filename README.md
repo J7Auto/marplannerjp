@@ -1,5 +1,8 @@
 # Marplanner
 
+> **Versión casa (fork):** en español, para un hogar en Valencia y con tareas también para
+> adultos. Qué cambia y cómo montarlo en tu servidor: **[CASA.md](CASA.md)**.
+
 Marplanner is a self-hosted household planner for a shared display. It combines
 calendar and external feeds, day periods, routines and chores, reminders, meals,
 daily messages, weather, spoken time, network devices, printing, daily briefings,
