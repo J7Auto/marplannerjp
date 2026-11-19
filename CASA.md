@@ -80,6 +80,19 @@ para registrar ese dispositivo. Haz esto una vez en la tablet de la pared.
   volumen `marplanner-casa_marplanner-data` y no se pierden.
 - **Copias de seguridad:** activa el plugin «Copias de seguridad» en Administración → Plugins.
 
+## Demo en Vercel (para probarlo)
+
+El repo se puede importar tal cual en Vercel: `vercel.json` compila la app y la empaqueta en una
+sola función (`src/server/vercel.ts`, `scripts/build-vercel.mjs`). Variables de entorno:
+`MP_ACCESS_TOKEN`, `MP_BOOTSTRAP_KEY` y `MP_ADMIN_PIN`. Con los valores públicos de ejemplo
+(`mpg-local-change-me`, `mpk-local-bootstrap-change-me`, `0000`) la pantalla de alta rellena la
+clave y el PIN sola, cómodo para enseñarlo.
+
+**Es solo para probar.** Vercel no tiene disco permanente: la base de datos vive en memoria
+temporal (`/tmp`), así que cada cierto tiempo la app vuelve a los datos de ejemplo, se pierde lo
+que hayas cambiado y hay que volver a entrar. Tampoco corren las tareas programadas (resumen
+impreso, copias, refresco de calendarios externos). Para usarlo de verdad, Docker en tu servidor.
+
 ## Para enseñarlo a amigos
 
 - **Rápido:** que lo vean en tu tablet o entren a tu instancia por Tailscale.
