@@ -9,6 +9,7 @@
  * background scheduler (briefings, backups, calendar polling) does not run here. For real use,
  * run the Docker image on a server (see CASA.md).
  */
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { FastifyInstance } from "fastify";
@@ -20,6 +21,12 @@ async function boot(): Promise<FastifyInstance> {
   process.env.DATA_DIR ??= "/tmp/marplanner";
   process.env.MP_SEED_ON_EMPTY ??= "true";
   process.env.SCHEDULER_DISABLED ??= "1";
+  // Every instance has its own database, so a device provisioned on one would be unknown to the
+  // next. Use one fixed device key, derived from the bootstrap key, and register it (and the
+  // admin PIN) on every instance at boot.
+  const bootstrapKey = process.env.MP_BOOTSTRAP_KEY ?? "";
+  process.env.MP_DEMO_DEVICE_KEY ??=
+    "mpk-demo-" + createHash("sha256").update(`marplanner-demo:${bootstrapKey}`).digest("hex");
   fs.mkdirSync(process.env.DATA_DIR, { recursive: true });
 
   const { acquireStorageOwnership } = await import("./db/runtime-storage");
@@ -43,6 +50,8 @@ async function boot(): Promise<FastifyInstance> {
   reconcileBootstrap();
   reconcileManagement();
 
+  await registerDemoDevice();
+
   const { wireNetworkDevicesCache } = await import("./modules/network-devices/cache");
   wireNetworkDevicesCache();
 
@@ -50,6 +59,21 @@ async function boot(): Promise<FastifyInstance> {
   const app = await buildApp();
   await app.ready();
   return app;
+}
+
+async function registerDemoDevice(): Promise<void> {
+  const db = (await import("./db/client")).getDb();
+  const { hashKey } = await import("./auth/credentials");
+  const { resolveAdminPin } = await import("./auth/default-credentials");
+  const argon2 = (await import("argon2")).default;
+  const now = Date.now();
+  db.prepare(
+    "INSERT OR IGNORE INTO api_keys (id, key_hash, scope, kind, label, created_at, expires_at, revoked_at) VALUES ('demo-device', ?, '*', 'device', 'Demo', ?, NULL, NULL)"
+  ).run(hashKey(process.env.MP_DEMO_DEVICE_KEY ?? ""), now);
+  const pinHash = await argon2.hash(resolveAdminPin());
+  db.prepare(
+    "INSERT INTO admin_config (id, pin_hash, updated_at) VALUES (1, ?, ?) ON CONFLICT(id) DO NOTHING"
+  ).run(pinHash, now);
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {

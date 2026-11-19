@@ -128,15 +128,18 @@ export async function provisionDevice(app: FastifyInstance, basePath = ""): Prom
         return reply.code(400).send({ error: error.code, message: error.message });
       }
 
-      // Mint a new device key.
-      const deviceKey = generateKey();
+      // Mint a new device key. Fork (casa): the Vercel demo sets MP_DEMO_DEVICE_KEY so every
+      // short-lived function instance (each with its own /tmp database) recognises the same
+      // device; see src/server/vercel.ts. Unset everywhere else, so nothing changes there.
+      const demoDeviceKey = process.env.MP_DEMO_DEVICE_KEY;
+      const deviceKey = demoDeviceKey ?? generateKey();
       const deviceKeyHash = hashKey(deviceKey);
       const keyId = randomUUID();
 
       // Persist the device key record: `*`-scoped, kind `'device'`, labelled, no expiry.
       // Use raw SQL (avoid vite SSR namespace import issues with drizzle).
       const insertStmt = db.prepare(
-        "INSERT INTO api_keys (id, key_hash, scope, kind, label, created_at, expires_at, revoked_at) VALUES (?, ?, '*', 'device', ?, ?, NULL, NULL)"
+        `INSERT ${demoDeviceKey ? "OR IGNORE " : ""}INTO api_keys (id, key_hash, scope, kind, label, created_at, expires_at, revoked_at) VALUES (?, ?, '*', 'device', ?, ?, NULL, NULL)`
       );
       insertStmt.run(keyId, deviceKeyHash, label, now);
 
